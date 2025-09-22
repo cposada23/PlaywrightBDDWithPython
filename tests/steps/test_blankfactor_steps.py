@@ -1,31 +1,12 @@
 import pytest
 import allure
 from pytest_bdd import given, when, then, scenarios, parsers
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
 from tests.pages.blankfactor_page import BlankfactorPage
+from conftest import capture_failure_screenshot
 
 scenarios('../features/blankfactor.feature')
-
-def capture_failure_screenshot(page: Page, step_name: str):
-    """Helper function to capture and attach screenshot on step failure."""
-    try:
-        screenshot_bytes = page.screenshot(full_page=True)
-        allure.attach(
-            screenshot_bytes,
-            name=f"Failure Screenshot - {step_name}",
-            attachment_type=allure.attachment_type.PNG
-        )
-    except Exception as e:
-        # If screenshot fails, attach error message
-        try:
-            allure.attach(
-                f"Screenshot capture failed: {str(e)}",
-                name="Screenshot Error",
-                attachment_type=allure.attachment_type.TEXT
-            )
-        except:
-            pass
 
 @pytest.fixture
 def blankfactor_page(page: Page) -> BlankfactorPage:

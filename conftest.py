@@ -95,7 +95,25 @@ def page(context: BrowserContext, base_url: str) -> Generator[Page, None, None]:
     yield page
 
 
-# Screenshot capture is now handled directly in step definitions for better Allure integration
+def capture_failure_screenshot(page: Page, step_name: str):
+    """Helper function to capture and attach screenshot on step failure."""
+    try:
+        screenshot_bytes = page.screenshot(full_page=True)
+        allure.attach(
+            screenshot_bytes,
+            name=f"Failure Screenshot - {step_name}",
+            attachment_type=allure.attachment_type.PNG
+        )
+    except Exception as e:
+        # If screenshot fails, attach error message
+        try:
+            allure.attach(
+                f"Screenshot capture failed: {str(e)}",
+                name="Screenshot Error",
+                attachment_type=allure.attachment_type.TEXT
+            )
+        except:
+            pass
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
