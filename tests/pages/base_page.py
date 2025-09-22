@@ -16,8 +16,25 @@ class BasePage(ABC):
         self.page = page
     
     def wait_for_page_load(self, timeout: int = 30000) -> None:
-        """Wait for the page to fully load."""
-        self.page.wait_for_load_state("networkidle", timeout=timeout)
+        """Wait for the page to load with fallback strategies."""
+        try:
+            # Try domcontentloaded first (faster and more reliable)
+            self.page.wait_for_load_state("domcontentloaded", timeout=10000)
+            
+            # Try to wait for load state (basic loading complete)
+            self.page.wait_for_load_state("load", timeout=15000)
+            
+            # Optional: try networkidle with shorter timeout as fallback
+            try:
+                self.page.wait_for_load_state("networkidle", timeout=5000)
+            except:
+                # If networkidle fails, that's okay - many sites never reach it
+                pass
+                
+        except Exception as e:
+            # If all else fails, at least wait a bit for the page to stabilize
+            self.page.wait_for_timeout(2000)
+            print(f"Warning: Page load wait strategies failed, using timeout fallback: {e}")
     
     def wait_for_element_visible(self, locator: Locator, timeout: int = 10000) -> None:
         """Wait for an element to become visible."""

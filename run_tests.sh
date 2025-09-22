@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Playwright BDD Test Runner Script
-# This script provides easy test execution with sensible defaults for debugging
+# This script provides easy test execution with defaults for debugging
 
 set -e  # Exit on error
 

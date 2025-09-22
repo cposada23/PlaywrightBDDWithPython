@@ -5,7 +5,6 @@ This module contains the LoginPage class with all locators and methods
 needed to interact with the login page elements.
 """
 
-import pytest
 import allure
 from playwright.sync_api import Page
 from tests.pages.base_page import BasePage
