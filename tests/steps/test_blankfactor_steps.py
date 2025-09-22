@@ -7,6 +7,26 @@ from tests.pages.blankfactor_page import BlankfactorPage
 
 scenarios('../features/blankfactor.feature')
 
+def capture_failure_screenshot(page: Page, step_name: str):
+    """Helper function to capture and attach screenshot on step failure."""
+    try:
+        screenshot_bytes = page.screenshot(full_page=True)
+        allure.attach(
+            screenshot_bytes,
+            name=f"Failure Screenshot - {step_name}",
+            attachment_type=allure.attachment_type.PNG
+        )
+    except Exception as e:
+        # If screenshot fails, attach error message
+        try:
+            allure.attach(
+                f"Screenshot capture failed: {str(e)}",
+                name="Screenshot Error",
+                attachment_type=allure.attachment_type.TEXT
+            )
+        except:
+            pass
+
 @pytest.fixture
 def blankfactor_page(page: Page) -> BlankfactorPage:
     """Create a BlankfactorPage instance for the test."""
@@ -15,7 +35,12 @@ def blankfactor_page(page: Page) -> BlankfactorPage:
 @given("I navigate to Blankfactor home page")
 def i_navigate_to_blankfactor_home_page(blankfactor_page: BlankfactorPage, base_url: str):
     """Navigate to the blankfactor home page."""
-    blankfactor_page.navigate_to_blankfactor(base_url)
+    with allure.step(f"Navigate to Blankfactor home page: {base_url}"):
+        try:
+            blankfactor_page.navigate_to_blankfactor(base_url)
+        except Exception as e:
+            capture_failure_screenshot(blankfactor_page.page, "Navigation")
+            raise AssertionError(f"Failed to navigate to Blankfactor home page: {str(e)}")
 
 @when(parsers.parse('I hover over "{select}" and open the "{section}" section'))
 def i_hover_over_select_and_open_section(blankfactor_page: BlankfactorPage, select: str, section: str):
@@ -29,8 +54,8 @@ def i_hover_over_select_and_open_section(blankfactor_page: BlankfactorPage, sele
                 case _:
                     raise Exception(f"Invalid select: {select}")
             blankfactor_page.open_item_in_select(section)
-            # assert login_page.is_on_login_page(), f"Failed to reach login page. Current URL: {login_page.page.url}"
         except Exception as e:
+            capture_failure_screenshot(blankfactor_page.page, f"Hover {select}")
             raise AssertionError(f"Failed to hover over the {select} and open the {section} section: {str(e)}") 
 
 @when("I copy the text from the 3dht tile")
@@ -43,4 +68,5 @@ def i_copy_the_text_from_the_3dht_tile(blankfactor_page: BlankfactorPage):
             expected_text = "Automate your operations and get to market quickly and securely. Leverage predictive data analytics using machine learning to build reliable, yet forward-thinking financial solutions."
             assert tile_text == expected_text, f"The tile text does not match the expected text: {tile_text} != {expected_text}"
         except Exception as e:
+            capture_failure_screenshot(blankfactor_page.page, "Copy Text")
             raise AssertionError(f"Failed to copy the text from the 3dht tile: {str(e)}")

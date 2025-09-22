@@ -95,35 +95,7 @@ def page(context: BrowserContext, base_url: str) -> Generator[Page, None, None]:
     yield page
 
 
-@pytest.fixture(autouse=True)
-def screenshot_on_failure(request, page: Page):
-    """Automatically capture screenshot on test failure."""
-    yield
-    
-    if hasattr(request.node, 'rep_call') and request.node.rep_call.failed:
-        screenshot_dir = Path("reports/screenshots")
-        screenshot_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Generate screenshot filename with timestamp
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        test_name = request.node.name.replace("::", "_").replace("[", "_").replace("]", "")
-        screenshot_path = screenshot_dir / f"{test_name}_{timestamp}.png"
-        
-        try:
-            # Capture screenshot
-            page.screenshot(path=str(screenshot_path), full_page=True)
-            print(f"\n📸 Screenshot saved: {screenshot_path}")
-            
-            # Attach screenshot to Allure report if available
-            if hasattr(allure, 'attach'):
-                with open(screenshot_path, "rb") as screenshot_file:
-                    allure.attach(
-                        screenshot_file.read(),
-                        name=f"Screenshot_{test_name}",
-                        attachment_type=allure.attachment_type.PNG
-                    )
-        except Exception as e:
-            print(f"❌ Failed to capture screenshot: {e}")
+# Screenshot capture is now handled directly in step definitions for better Allure integration
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
