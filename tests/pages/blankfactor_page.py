@@ -20,7 +20,7 @@ class BlankfactorPage(BasePage):
 
         # Define locators for blankfactor page elements
         self.industries_select = page.locator("//header//a/span[normalize-space(text()) = 'Industries']")
-        self.lets_get_started_button = page.locator("//a[normalize-space(text()) = 'Let\'s get started']")
+        self.lets_get_started_button = page.locator('//a[normalize-space(text()) = "Let\'s get started"]')
     
     def navigate_to_blankfactor(self, base_url: str):
         """Navigate to the blankfactor page."""
@@ -65,3 +65,12 @@ class BlankfactorPage(BasePage):
                 return tile_text.strip()
             except Exception as e:
                 raise Exception(f"Failed to copy the text from the {tile_index} tile: {str(e)}")
+
+    def click_on_the_lets_get_started_button(self):
+        """Click on the Let's get started button."""
+        with allure.step("Click on the Let's get started button"):
+            try:
+                self.lets_get_started_button.wait_for(state="visible")
+                self.lets_get_started_button.click()
+            except Exception as e:
+                raise Exception(f"Failed to click on the Let's get started button: {str(e)}")

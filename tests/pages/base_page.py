@@ -26,6 +26,10 @@ class BasePage(ABC):
     def scroll_to_element(self, locator: Locator) -> None:
         """Scroll to make an element visible."""
         locator.scroll_into_view_if_needed()
+
+    def scroll_to_the_bottom_of_the_page(self) -> None:
+        """Scroll to the bottom of the page."""
+        self.page.keyboard.press("End")
     
     def get_page_title(self) -> str:
         """Get the current page title."""

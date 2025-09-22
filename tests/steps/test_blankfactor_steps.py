@@ -51,3 +51,34 @@ def i_copy_the_text_from_the_3dht_tile(blankfactor_page: BlankfactorPage):
         except Exception as e:
             capture_failure_screenshot(blankfactor_page.page, "Copy Text")
             raise AssertionError(f"Failed to copy the text from the 3dht tile: {str(e)}")
+
+@when("I scroll to the bottom of the page and click on the Let's get started button")
+def i_scroll_to_the_bottom_of_the_page_and_click_on_the_lets_get_started_button(blankfactor_page: BlankfactorPage):
+    """Scroll to the bottom of the page and click on the Let's get started button"""
+    with allure.step("Scroll to the bottom of the page and click on the Let's get started button"):
+        try:
+            blankfactor_page.scroll_to_the_bottom_of_the_page()
+            blankfactor_page.click_on_the_lets_get_started_button()
+        except Exception as e:
+            capture_failure_screenshot(blankfactor_page.page, "Scroll to the bottom of the page and click on the Let's get started button")
+            raise AssertionError(f"Failed to scroll to the bottom of the page and click on the Let's get started button: {str(e)}")
+
+@then(parsers.parse('I verify that the page is loaded and the page url is "{url}"'))
+def i_verify_that_the_page_is_loaded_and_the_page_url_is(blankfactor_page: BlankfactorPage, url: str):
+    """Verify that the page is loaded and the page url is {url}"""
+    with allure.step(f"Verify that the page is loaded and the page url is {url}"):
+        try:
+            assert blankfactor_page.get_current_url() == url, f"The page url does not match the expected url: {blankfactor_page.get_current_url()} != {url}"
+        except Exception as e:
+            capture_failure_screenshot(blankfactor_page.page, "Verify that the page is loaded and the page url is {url}")
+            raise AssertionError(f"Failed to verify that the page is loaded and the page url is {url}: {str(e)}")
+
+@then(parsers.parse('I verify the page title is "{title}"'))
+def i_verify_the_page_title_is(blankfactor_page: BlankfactorPage, title: str):
+    """Verify the page title is {title}"""
+    with allure.step(f"Verify the page title is {title}"):
+        try:
+            assert blankfactor_page.get_page_title() == title, f"The page title does not match the expected title: {blankfactor_page.get_page_title()} != {title}"
+        except Exception as e:
+            capture_failure_screenshot(blankfactor_page.page, "Verify the page title is {title}")
+            raise AssertionError(f"Failed to verify the page title is {title}: {str(e)}")
