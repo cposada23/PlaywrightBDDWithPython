@@ -122,3 +122,45 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     rep = outcome.get_result()
     setattr(item, "rep_" + rep.when, rep)
+
+@pytest.hookimpl
+def pytest_bdd_after_step(request, feature, scenario, step, step_func_args):
+    """Hook that runs after each BDD step - prints step result."""
+    from datetime import datetime
+    
+    # Get current time for logging
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    
+    # Format step information
+    step_text = f"{step.keyword} {step.name}"
+    scenario_name = scenario.name
+    feature_name = feature.name
+    
+    # Print step result with formatting (only for successful steps that reach this hook)
+    print(f"\n{'='*80}")
+    print(f"🎯 BDD STEP RESULT [{timestamp}] ✅ PASSED")
+    print(f"{'='*80}")
+    print(f"📋 Feature: {feature_name}")
+    print(f"🎭 Scenario: {scenario_name}")  
+    print(f"📝 Step: {step_text}")
+    print(f"{'='*80}\n")
+
+
+# Main screenshot capture hook - catches all test failures
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_call(item):
+    """Hook to capture screenshots on any test failure."""
+    outcome = yield
+    
+    if outcome.excinfo is not None:
+        print(f"\n🔥 TEST FAILURE DETECTED - Capturing screenshot...")
+        
+        # Try to get page from any available fixture
+        try:
+            page = item._request.getfixturevalue('page')
+            capture_failure_screenshot(page, f"Test Failure: {item.name}")
+            print(f"📸 Screenshot captured and attached to Allure report")
+        except Exception as e:
+            print(f"❌ Could not capture screenshot: {e}")
+
+    
